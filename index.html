@@ -16,27 +16,54 @@
   body {
     font-family: 'Source Sans 3', sans-serif; background: var(--bg);
     min-height: 100vh; display: flex; flex-direction: column;
-    align-items: center; padding: 28px 16px 60px;
+    align-items: center; padding: 0 0 60px;
     background-image: radial-gradient(ellipse at 20% 20%, rgba(107,26,46,0.06) 0%, transparent 55%),
                       radial-gradient(ellipse at 80% 80%, rgba(201,168,76,0.06) 0%, transparent 55%);
   }
-  header { text-align: center; margin-bottom: 24px; }
-  header h1 { font-family: 'Playfair Display', serif; font-size: 1.9rem; color: var(--maroon); }
-  header p { color: var(--mid); font-size: 0.88rem; margin-top: 5px; font-weight: 300; }
 
-  .container { width: 100%; max-width: 780px; display: flex; flex-direction: column; gap: 18px; }
+  /* ── TOP NAV ── */
+  .topnav {
+    width: 100%; background: white;
+    box-shadow: 0 2px 12px rgba(107,26,46,0.08);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px; height: 60px; position: sticky; top: 0; z-index: 100;
+  }
+  .topnav-brand { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--maroon); font-weight: 700; }
+  .topnav-brand span { font-size: 0.72rem; font-family: 'Source Sans 3', sans-serif; font-weight: 400; color: var(--mid); display: block; margin-top: -3px; letter-spacing: 0.04em; }
+  .tab-btns { display: flex; gap: 4px; background: var(--bg); border-radius: 8px; padding: 4px; }
+  .tab-btn {
+    font-family: 'Source Sans 3', sans-serif; font-size: 0.86rem; font-weight: 600;
+    padding: 7px 20px; border-radius: 6px; border: none; cursor: pointer;
+    color: var(--mid); background: transparent; transition: all 0.18s; letter-spacing: 0.02em;
+  }
+  .tab-btn.active { background: white; color: var(--maroon); box-shadow: 0 1px 6px rgba(107,26,46,0.12); }
+  .tab-btn:hover:not(.active) { color: var(--maroon); }
+  .sync-badge {
+    font-size: 0.75rem; background: var(--green-light); color: var(--green);
+    border-radius: 20px; padding: 4px 12px; font-weight: 600; cursor: pointer;
+    border: none; font-family: 'Source Sans 3', sans-serif; transition: all 0.18s;
+  }
+  .sync-badge:hover { background: #d0eddb; }
+  .sync-badge.loading { background: #e8f0ff; color: #1a3a8a; }
+  .sync-badge.error { background: #ffeaea; color: #8a1a1a; }
 
+  /* ── PAGE WRAPPER ── */
+  .page { display: none; width: 100%; max-width: 860px; padding: 28px 16px; }
+  .page.active { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+
+  /* ── CARDS ── */
   .card {
-    background: white; border-radius: 12px; padding: 26px 30px;
+    background: white; border-radius: 12px; padding: 26px 30px; width: 100%;
     box-shadow: 0 3px 18px rgba(107,26,46,0.07), 0 1px 3px rgba(0,0,0,0.04);
   }
   .card h2 {
-    font-family: 'Playfair Display', serif; font-size: 1rem;
-    color: var(--maroon); margin-bottom: 16px; padding-bottom: 10px;
-    border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px;
+    font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--maroon);
+    margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
   }
   .card h2::before { content: ''; display: inline-block; width: 4px; height: 15px; background: var(--gold); border-radius: 2px; }
 
+  /* ── FORM ── */
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .form-group { display: flex; flex-direction: column; gap: 5px; }
   .form-group.full { grid-column: span 2; }
@@ -48,16 +75,13 @@
   }
   input:focus, select:focus { border-color: var(--maroon); box-shadow: 0 0 0 3px rgba(107,26,46,0.07); background: white; }
   input[readonly] { background: #f0e8e8; color: var(--maroon); font-weight: 700; cursor: default; }
-
   .sno-row { display: flex; gap: 8px; align-items: center; }
   .sno-row input { width: 90px; text-align: center; font-size: 1.1rem; }
-  .btn-reset { background: none; border: 1.5px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 0.78rem; color: var(--mid); cursor: pointer; white-space: nowrap; font-family: 'Source Sans 3', sans-serif; }
-  .btn-reset:hover { border-color: var(--maroon); color: var(--maroon); }
-
   .amount-row { display: flex; align-items: center; gap: 8px; }
   .amount-sym { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--maroon); font-weight: 700; }
   .amount-row input { flex: 1; font-size: 1.1rem; font-weight: 600; color: var(--maroon); }
 
+  /* ── BUTTONS ── */
   .btn-row { display: flex; gap: 12px; justify-content: center; margin-top: 22px; flex-wrap: wrap; }
   button { font-family: 'Source Sans 3', sans-serif; font-size: 0.92rem; font-weight: 600; letter-spacing: 0.03em; padding: 11px 26px; border-radius: 8px; border: none; cursor: pointer; transition: all 0.18s; }
   .btn-primary { background: linear-gradient(135deg, var(--maroon), var(--maroon-light)); color: white; box-shadow: 0 4px 14px rgba(107,26,46,0.22); }
@@ -65,18 +89,24 @@
   .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
   .btn-secondary { background: var(--cream); color: var(--maroon); border: 1.5px solid var(--border); }
   .btn-secondary:hover { background: white; border-color: var(--maroon); }
+  .btn-sm { padding: 6px 14px; font-size: 0.78rem; border-radius: 6px; }
+  .btn-icon { padding: 6px 10px; font-size: 0.78rem; border-radius: 6px; background: var(--cream); color: var(--maroon); border: 1.5px solid var(--border); }
+  .btn-icon:hover { background: white; border-color: var(--maroon); }
+  .btn-reset-sno { background: none; border: 1.5px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 0.78rem; color: var(--mid); cursor: pointer; white-space: nowrap; font-family: 'Source Sans 3', sans-serif; }
+  .btn-reset-sno:hover { border-color: var(--maroon); color: var(--maroon); }
 
-  /* Sheets status */
+  /* ── SHEETS STATUS ── */
   #sheets-status {
-    display: none; width: 100%; max-width: 780px;
-    padding: 10px 16px; border-radius: 8px; font-size: 0.82rem; align-items: center; gap: 8px; margin-top: 6px;
+    display: none; width: 100%; max-width: 860px;
+    padding: 10px 16px; border-radius: 8px; font-size: 0.82rem;
+    align-items: center; gap: 8px; margin-top: 2px;
   }
   #sheets-status.saving { display: flex; background: #e8f0ff; color: #1a3a8a; }
   #sheets-status.saved  { display: flex; background: var(--green-light); color: var(--green); }
   #sheets-status.failed { display: flex; background: #ffeaea; color: #8a1a1a; }
 
-  /* Receipt preview */
-  #receipt-preview { display: none; width: 100%; max-width: 780px; margin-top: 18px; }
+  /* ── RECEIPT PREVIEW ── */
+  #receipt-preview { display: none; width: 100%; }
   .receipt-paper {
     background: white; border-radius: 10px;
     box-shadow: 0 8px 40px rgba(0,0,0,0.1);
@@ -103,31 +133,98 @@
   .sig-co { font-weight: 700; color: #6b1a2e; font-size: 11px; }
   .dl-row { display: flex; justify-content: center; gap: 14px; margin-top: 16px; flex-wrap: wrap; }
 
-  /* Toast */
+  /* ── HISTORY PAGE ── */
+  .history-header {
+    width: 100%; display: flex; align-items: center;
+    justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 4px;
+  }
+  .history-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--maroon); }
+  .history-stats { display: flex; gap: 16px; flex-wrap: wrap; }
+  .stat-pill {
+    background: white; border-radius: 8px; padding: 8px 16px;
+    box-shadow: 0 2px 8px rgba(107,26,46,0.07); font-size: 0.82rem; color: var(--mid);
+  }
+  .stat-pill strong { color: var(--maroon); font-size: 1.1rem; display: block; }
+
+  .search-bar {
+    width: 100%; background: white; border-radius: 10px; padding: 16px 20px;
+    box-shadow: 0 2px 10px rgba(107,26,46,0.06);
+    display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+  }
+  .search-bar input {
+    flex: 1; min-width: 180px; border: 1.5px solid var(--border); border-radius: 7px;
+    padding: 8px 12px; font-size: 0.88rem; background: var(--cream);
+  }
+  .search-bar input:focus { border-color: var(--maroon); box-shadow: 0 0 0 3px rgba(107,26,46,0.07); background: white; }
+  .search-bar select { width: 160px; padding: 8px 10px; font-size: 0.88rem; }
+
+  .history-table-wrap {
+    width: 100%; background: white; border-radius: 12px; overflow: hidden;
+    box-shadow: 0 3px 18px rgba(107,26,46,0.07);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  thead { background: var(--maroon); color: white; }
+  thead th { padding: 12px 14px; text-align: left; font-weight: 600; font-size: 0.78rem; letter-spacing: 0.04em; white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid #f0e8e0; transition: background 0.15s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #fdf8f2; }
+  tbody td { padding: 11px 14px; color: var(--dark); vertical-align: middle; }
+  .sno-cell { font-weight: 700; color: var(--maroon); font-size: 0.9rem; }
+  .amount-cell { font-weight: 700; color: var(--green); }
+  .empty-state {
+    text-align: center; padding: 48px 20px; color: var(--mid);
+    font-size: 0.9rem; display: none;
+  }
+  .empty-state .icon { font-size: 2.5rem; margin-bottom: 10px; }
+  #history-loading {
+    text-align: center; padding: 40px; color: var(--mid); font-size: 0.9rem;
+  }
+  .spinner {
+    display: inline-block; width: 20px; height: 20px;
+    border: 2px solid var(--border); border-top-color: var(--maroon);
+    border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 8px; vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── TOAST ── */
   #toast {
     position: fixed; bottom: 26px; left: 50%;
     transform: translateX(-50%) translateY(80px);
     background: #1a3a1a; color: white; padding: 11px 22px;
     border-radius: 8px; font-size: 0.86rem; font-weight: 600;
-    transition: transform 0.28s ease; z-index: 999; white-space: nowrap;
+    transition: transform 0.28s ease; z-index: 9999; white-space: nowrap;
   }
   #toast.show { transform: translateX(-50%) translateY(0); }
-  #toast.err { background: #6b1a2e; }
+  #toast.err { background: var(--maroon); }
 
-  @media (max-width: 560px) {
+  @media (max-width: 600px) {
     .form-grid { grid-template-columns: 1fr; }
     .form-group.full { grid-column: span 1; }
+    .topnav { padding: 0 16px; }
+    thead th:nth-child(4), thead th:nth-child(5), thead th:nth-child(6),
+    tbody td:nth-child(4), tbody td:nth-child(5), tbody td:nth-child(6) { display: none; }
   }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>Swargaseema Receipt Generator</h1>
-  <p>Fill details &rarr; Preview &rarr; Download PDF &rarr; Auto-saved to Google Sheets</p>
-</header>
+<!-- ── TOP NAV ── -->
+<nav class="topnav">
+  <div class="topnav-brand">
+    Swargaseema
+    <span>Receipt Manager</span>
+  </div>
+  <div class="tab-btns">
+    <button class="tab-btn active" onclick="switchTab('new')">&#43; New Receipt</button>
+    <button class="tab-btn" onclick="switchTab('history')">&#9776; History</button>
+  </div>
+  <button class="sync-badge" id="sync-btn" onclick="loadHistory()">&#8635; Sync</button>
+</nav>
 
-<div class="container">
+<!-- ══════════════════════════════════════
+     PAGE 1 — NEW RECEIPT
+══════════════════════════════════════ -->
+<div class="page active" id="page-new">
 
   <div class="card">
     <h2>Receipt Details</h2>
@@ -136,7 +233,7 @@
         <label>Serial Number</label>
         <div class="sno-row">
           <input type="text" id="sno" readonly>
-          <button class="btn-reset" onclick="resetSno()">&#x21BA; Reset</button>
+          <button class="btn-reset-sno" onclick="resetSno()">&#x21BA; Reset</button>
         </div>
       </div>
       <div class="form-group">
@@ -201,7 +298,7 @@
       </div>
       <div class="form-group full">
         <label>Venture Name</label>
-        <input type="text" id="venture" placeholder="e.g. Green Valley Phase 2">
+        <input type="text" id="venture" placeholder="e.g. Ameya">
       </div>
     </div>
     <div class="btn-row">
@@ -210,265 +307,464 @@
     </div>
   </div>
 
-</div>
+  <div id="sheets-status"></div>
 
-<div id="sheets-status"></div>
-
-<!-- Receipt Preview -->
-<div id="receipt-preview">
-  <div class="receipt-paper">
-    <div class="receipt-top">
-      <div>
-        <div class="r-brand">SWARGASEEMA</div>
-        <div class="r-sub">Sandalwood Farms Pvt. Ltd.</div>
-        <div class="r-tag">add big results...</div>
-        <div class="r-addr">
-          Unit # S-7, Second Floor, Fantasy Square Complex,<br>
-          Gachibowli, Hyderabad - 500032<br>
-          Mob: 9849012500, 9848661666<br>
-          Email: swargaseemasandalwood@gmail.com &nbsp;|&nbsp; Web: www.swargaseema.com
+  <!-- Receipt Preview -->
+  <div id="receipt-preview">
+    <div class="receipt-paper">
+      <div class="receipt-top">
+        <div>
+          <div class="r-brand">SWARGASEEMA</div>
+          <div class="r-sub">Sandalwood Farms Pvt. Ltd.</div>
+          <div class="r-tag">add big results...</div>
+          <div class="r-addr">
+            Unit # S-7, Second Floor, Fantasy Square Complex,<br>
+            Gachibowli, Hyderabad - 500032<br>
+            Mob: 9849012500, 9848661666<br>
+            Email: swargaseemasandalwood@gmail.com &nbsp;|&nbsp; Web: www.swargaseema.com
+          </div>
+        </div>
+        <div>
+          <div class="r-badge">RECEIPT</div>
+          <div class="r-sno-blk">
+            <div class="r-sno-val">S. No. &nbsp;<span id="r-sno"></span></div>
+            <div class="r-date-val" id="r-date"></div>
+          </div>
         </div>
       </div>
-      <div>
-        <div class="r-badge">RECEIPT</div>
-        <div class="r-sno-blk">
-          <div class="r-sno-val">S. No. &nbsp;<span id="r-sno"></span></div>
-          <div class="r-date-val" id="r-date"></div>
+      <div class="r-line">Received with thanks a sum of Rupees &nbsp;<span class="uv" id="r-words"></span>&nbsp; only</div>
+      <div class="r-line">from Sri/Smt/Kum &nbsp;<span class="uv" id="r-from"></span></div>
+      <div class="r-line">
+        by <span id="r-paymode"></span> / Cheque No.&nbsp;<span class="uv" id="r-cheque" style="min-width:90px;"></span>
+        &nbsp;Drawn on&nbsp;<span class="uv" id="r-bank" style="min-width:80px;"></span>&nbsp;Bank,
+        &nbsp;<span class="uv" id="r-branch" style="min-width:80px;"></span>&nbsp;Branch
+      </div>
+      <div class="r-line">
+        Plot No.&nbsp;<span class="uv" id="r-plot" style="min-width:60px;"></span>
+        &nbsp;&nbsp;Plot/Farm Land Size&nbsp;<span class="uv" id="r-size" style="min-width:90px;"></span>
+        &nbsp;&nbsp;Venture:&nbsp;<span class="uv" id="r-venture" style="min-width:110px;"></span>
+      </div>
+      <div class="r-amt-row">
+        <span class="r-rs">Rs.</span>
+        <span class="r-amt" id="r-amount"></span>
+      </div>
+      <div class="r-note">Subject to realization of cheque</div>
+      <div class="r-footer">
+        <div class="sig-blk">
+          <div style="height:36px;"></div>
+          <div>For &nbsp;<span class="sig-co">Swargaseema Sandalwood Farms Pvt. Ltd.,</span></div>
+          <div style="margin-top:5px;">Authorised Signatory</div>
         </div>
       </div>
     </div>
-    <div class="r-line">Received with thanks a sum of Rupees &nbsp;<span class="uv" id="r-words"></span>&nbsp; only</div>
-    <div class="r-line">from Sri/Smt/Kum &nbsp;<span class="uv" id="r-from"></span></div>
-    <div class="r-line">
-      by <span id="r-paymode"></span> / Cheque No.&nbsp;<span class="uv" id="r-cheque" style="min-width:90px;"></span>
-      &nbsp;Drawn on&nbsp;<span class="uv" id="r-bank" style="min-width:80px;"></span>&nbsp;Bank,
-      &nbsp;<span class="uv" id="r-branch" style="min-width:80px;"></span>&nbsp;Branch
-    </div>
-    <div class="r-line">
-      Plot No.&nbsp;<span class="uv" id="r-plot" style="min-width:60px;"></span>
-      &nbsp;&nbsp;Plot/Farm Land Size&nbsp;<span class="uv" id="r-size" style="min-width:90px;"></span>
-      &nbsp;&nbsp;Venture:&nbsp;<span class="uv" id="r-venture" style="min-width:110px;"></span>
-    </div>
-    <div class="r-amt-row">
-      <span class="r-rs">Rs.</span>
-      <span class="r-amt" id="r-amount"></span>
-    </div>
-    <div class="r-note">Subject to realization of cheque</div>
-    <div class="r-footer">
-      <div class="sig-blk">
-        <div style="height:36px;"></div>
-        <div>For &nbsp;<span class="sig-co">Swargaseema Sandalwood Farms Pvt. Ltd.,</span></div>
-        <div style="margin-top:5px;">Authorised Signatory</div>
-      </div>
+    <div class="dl-row">
+      <button class="btn-secondary" onclick="document.getElementById('receipt-preview').style.display='none'">&#8592; Edit</button>
+      <button class="btn-primary" id="dl-btn" onclick="downloadAndSave()">&#8595; Download PDF &amp; Save to Sheets</button>
     </div>
   </div>
-  <div class="dl-row">
-    <button class="btn-secondary" onclick="document.getElementById('receipt-preview').style.display='none'">&#8592; Edit</button>
-    <button class="btn-primary" id="dl-btn" onclick="downloadAndSave()">&#8595; Download PDF &amp; Save to Sheets</button>
+
+</div><!-- end page-new -->
+
+
+<!-- ══════════════════════════════════════
+     PAGE 2 — HISTORY
+══════════════════════════════════════ -->
+<div class="page" id="page-history">
+
+  <div class="history-header">
+    <div class="history-title">Receipt History</div>
+    <div class="history-stats">
+      <div class="stat-pill"><strong id="stat-total">—</strong>Total Receipts</div>
+      <div class="stat-pill"><strong id="stat-amount">—</strong>Total Amount</div>
+    </div>
   </div>
-</div>
+
+  <div class="search-bar">
+    <input type="text" id="search-input" placeholder="&#128269; Search by name, plot, venture..." oninput="filterHistory()">
+    <select id="filter-mode" onchange="filterHistory()">
+      <option value="">All Payment Modes</option>
+      <option>Cash</option>
+      <option>Card</option>
+      <option>Cheque</option>
+      <option>Online / NEFT</option>
+    </select>
+    <button class="btn-secondary btn-sm" onclick="loadHistory()">&#8635; Refresh</button>
+  </div>
+
+  <div class="history-table-wrap">
+    <div id="history-loading"><span class="spinner"></span> Loading receipts...</div>
+    <div class="empty-state" id="history-empty">
+      <div class="icon">&#128196;</div>
+      No receipts found. Try a different search.
+    </div>
+    <table id="history-table" style="display:none;">
+      <thead>
+        <tr>
+          <th>S.No</th>
+          <th>Date</th>
+          <th>Name</th>
+          <th>Plot No</th>
+          <th>Venture</th>
+          <th>Pay Mode</th>
+          <th>Amount</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="history-tbody"></tbody>
+    </table>
+  </div>
+
+</div><!-- end page-history -->
 
 <div id="toast"></div>
 
 <script>
-  // ── Config ──
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxiWflUsq1uLmwXRJ-tJkKPFCfOEPa9mCp08mIqj0nuTuYVoMPd-GMAbDlVebSh324/exec';
-  const SNO_KEY    = 'swarga_sno_v2';
+// ─────────────────────────────────────
+//  CONFIG
+// ─────────────────────────────────────
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxFoRnbaOW9Jf-PAbee1enqMjv7y-qXWbJ7CGLa-NALL1bGQn5zoJWNaeMmuqFjy7R9/exec';
+const SNO_KEY    = 'swarga_sno_v2';
 
-  // ── Serial Number ──
-  function curSno()  { return parseInt(localStorage.getItem(SNO_KEY) || '1', 10); }
-  function fmtSno(n) { return String(n).padStart(3, '0'); }
-  function refreshSno() { document.getElementById('sno').value = fmtSno(curSno()); }
-  function resetSno() {
-    const n = prompt('Reset serial number to:', '1');
-    if (n && !isNaN(parseInt(n)) && parseInt(n) > 0) {
-      localStorage.setItem(SNO_KEY, parseInt(n));
+// ─────────────────────────────────────
+//  TABS
+// ─────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (i===0 && tab==='new') || (i===1 && tab==='history')));
+  document.getElementById('page-new').classList.toggle('active', tab === 'new');
+  document.getElementById('page-history').classList.toggle('active', tab === 'history');
+  if (tab === 'history') loadHistory();
+}
+
+// ─────────────────────────────────────
+//  SERIAL NUMBER
+// ─────────────────────────────────────
+function curSno()  { return parseInt(localStorage.getItem(SNO_KEY) || '1', 10); }
+function fmtSno(n) { return String(n).padStart(3, '0'); }
+function refreshSno() { document.getElementById('sno').value = fmtSno(curSno()); }
+function resetSno() {
+  const n = prompt('Reset serial number to:', '1');
+  if (n && !isNaN(parseInt(n)) && parseInt(n) > 0) {
+    localStorage.setItem(SNO_KEY, parseInt(n));
+    refreshSno();
+    showToast('Serial reset to ' + fmtSno(parseInt(n)));
+  }
+}
+
+// Sync serial from sheet row count
+async function syncSerialFromSheet() {
+  try {
+    const res = await fetch(SCRIPT_URL + '?action=count');
+    const data = await res.json();
+    if (data.count !== undefined) {
+      const nextSno = data.count + 1;
+      localStorage.setItem(SNO_KEY, nextSno);
       refreshSno();
-      showToast('Serial reset to ' + fmtSno(parseInt(n)));
     }
+  } catch(e) {
+    // silently fall back to localStorage value
+    refreshSno();
   }
+}
 
-  // ── Toast ──
-  let _tt;
-  function showToast(msg, isErr) {
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.className = 'show' + (isErr ? ' err' : '');
-    clearTimeout(_tt); _tt = setTimeout(() => { t.className = ''; }, 3000);
-  }
+// ─────────────────────────────────────
+//  TOAST
+// ─────────────────────────────────────
+let _tt;
+function showToast(msg, isErr) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'show' + (isErr ? ' err' : '');
+  clearTimeout(_tt); _tt = setTimeout(() => { t.className = ''; }, 3200);
+}
 
-  // ── Init ──
-  document.getElementById('date').valueAsDate = new Date();
+// ─────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────
+document.getElementById('date').valueAsDate = new Date();
+syncSerialFromSheet();
+
+function v(id) { return document.getElementById(id).value.trim(); }
+
+// ─────────────────────────────────────
+//  PREVIEW
+// ─────────────────────────────────────
+function generateReceipt() {
+  const sno     = fmtSno(curSno());
+  const dateStr = v('date') ? new Date(v('date')).toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'}) : '';
+  const num     = v('amount_num');
+
+  document.getElementById('r-sno').textContent     = sno;
+  document.getElementById('r-date').textContent    = dateStr;
+  document.getElementById('r-from').textContent    = v('from_name')    || '_______________';
+  document.getElementById('r-words').textContent   = v('amount_words') || '_______________';
+  document.getElementById('r-paymode').textContent = v('pay_mode')     || 'Cash';
+  document.getElementById('r-cheque').textContent  = v('cheque_no')    || '—';
+  document.getElementById('r-bank').textContent    = v('bank')         || '—';
+  document.getElementById('r-branch').textContent  = v('branch')       || '—';
+  document.getElementById('r-plot').textContent    = v('plot_no')      || '—';
+  document.getElementById('r-size').textContent    = v('land_size')    || '—';
+  document.getElementById('r-venture').textContent = v('venture')      || '—';
+  document.getElementById('r-amount').textContent  = num
+    ? 'Rs. ' + parseFloat(num).toLocaleString('en-IN', {minimumFractionDigits:2})
+    : '_______________';
+
+  document.getElementById('receipt-preview').style.display = 'block';
+  setTimeout(() => document.getElementById('receipt-preview').scrollIntoView({behavior:'smooth', block:'start'}), 50);
+}
+
+// ─────────────────────────────────────
+//  PDF GENERATOR (shared)
+// ─────────────────────────────────────
+function buildPDF(r) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a5'});
+  const W = 148, mg = 12;
+  let y = 14;
+
+  doc.setFillColor(107,26,46); doc.rect(mg, y-6, W-mg*2, 1.5, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.setTextColor(107,26,46);
+  doc.text('SWARGASEEMA', mg, y+2);
+  doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(80,80,80);
+  doc.text('SANDALWOOD FARMS PVT. LTD.', mg, y+7);
+  doc.setFontSize(6.5); doc.setTextColor(140,140,140); doc.text('add big results...', mg, y+11);
+  doc.setFontSize(6.5); doc.setTextColor(90,90,90);
+  ['Unit # S-7, Second Floor, Fantasy Square Complex,',
+   'Gachibowli, Hyderabad - 500032',
+   'Mob: 9849012500, 9848661666',
+   'Email: swargaseemasandalwood@gmail.com | Web: www.swargaseema.com'
+  ].forEach((l,i) => doc.text(l, mg, y+16+i*4));
+
+  doc.setFillColor(107,26,46); doc.roundedRect(W-mg-34, y-4, 34, 12, 2, 2, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(255,255,255);
+  doc.text('RECEIPT', W-mg-17, y+4.5, {align:'center'});
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(107,26,46);
+  doc.text('S. No.  ' + r.sno, W-mg, y+14, {align:'right'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(90,90,90);
+  doc.text(r.date || '', W-mg, y+19, {align:'right'});
+
+  y += 38;
+  doc.setDrawColor(180,160,130); doc.setLineWidth(0.5); doc.line(mg, y, W-mg, y);
+  y += 8;
+
+  const dline = (lbl, val) => {
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(60,60,60); doc.text(lbl, mg, y);
+    const lw = doc.getTextWidth(lbl);
+    doc.setFont('helvetica','bold'); doc.setTextColor(20,20,20); doc.text(val||'—', mg+lw+1, y);
+    doc.setDrawColor(100,100,100); doc.setLineWidth(0.3);
+    doc.line(mg+lw+1, y+1, mg+lw+1+Math.max(doc.getTextWidth(val||'—'), 40), y+1);
+    y += 8;
+  };
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(60,60,60);
+  doc.text('Received with thanks a sum of Rupees', mg, y); y += 7;
+  doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(20,20,20);
+  doc.text((r.words||'—') + '  only', mg, y);
+  doc.setDrawColor(100,100,100); doc.setLineWidth(0.3); doc.line(mg, y+1, W-mg, y+1);
+  y += 9;
+
+  dline('from Sri/Smt/Kum  ', r.name);
+  dline('by ' + (r.payMode||'Cash') + ' / Cheque No.  ', r.cheque);
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(60,60,60); doc.text('Drawn on  ', mg, y);
+  const bLw = doc.getTextWidth('Drawn on  ');
+  doc.setFont('helvetica','bold'); doc.setTextColor(20,20,20); doc.text(r.bank||'—', mg+bLw+1, y);
+  doc.setDrawColor(100,100,100); doc.setLineWidth(0.3); doc.line(mg+bLw+1, y+1, mg+bLw+1+Math.max(doc.getTextWidth(r.bank||'—'),28), y+1);
+  const ab = mg+bLw+1+Math.max(doc.getTextWidth(r.bank||'—'),28)+3;
+  doc.setFont('helvetica','normal'); doc.setTextColor(60,60,60); doc.text('Bank,  ', ab, y);
+  doc.setFont('helvetica','bold'); doc.setTextColor(20,20,20); doc.text(r.branch||'—', ab+doc.getTextWidth('Bank,  ')+1, y);
+  doc.text(' Branch', ab+doc.getTextWidth('Bank,  ')+1+doc.getTextWidth(r.branch||'—'), y);
+  y += 9;
+
+  dline('Plot No.  ', r.plotNo);
+  dline('Plot/Farm Land Size  ', r.landSize);
+  dline('Venture  ', r.venture);
+
+  y += 4;
+  doc.setFillColor(253,248,240); doc.roundedRect(mg, y, W-mg*2, 14, 2, 2, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(107,26,46);
+  doc.text('Rs.', mg+4, y+9.5);
+  doc.setFontSize(15); doc.setTextColor(20,20,20);
+  const amtDisplay = r.amount && !isNaN(parseFloat(r.amount))
+    ? parseFloat(r.amount).toLocaleString('en-IN', {minimumFractionDigits:2}) : (r.amount || '—');
+  doc.text(amtDisplay, mg+18, y+9.5);
+  y += 18;
+
+  doc.setFont('helvetica','italic'); doc.setFontSize(7.5); doc.setTextColor(150,150,150);
+  doc.text('Subject to realization of cheque', mg, y); y += 14;
+
+  doc.setDrawColor(180,160,130); doc.setLineWidth(0.4); doc.line(mg, y, W-mg, y); y += 8;
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(80,80,80); doc.text('For', W-mg-62, y);
+  doc.setFont('helvetica','bold'); doc.setTextColor(107,26,46); doc.text('Swargaseema Sandalwood Farms Pvt. Ltd.,', W-mg-55, y);
+  y += 14;
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(80,80,80); doc.text('Authorised Signatory', W-mg-39, y);
+  doc.setFillColor(107,26,46); doc.rect(mg, y+6, W-mg*2, 1, 'F');
+
+  return doc;
+}
+
+// ─────────────────────────────────────
+//  DOWNLOAD NEW RECEIPT + SAVE
+// ─────────────────────────────────────
+async function downloadAndSave() {
+  const btn = document.getElementById('dl-btn');
+  btn.disabled = true; btn.textContent = 'Generating...';
+
+  const snoNum   = curSno();
+  const sno      = fmtSno(snoNum);
+  const dateStr  = v('date') ? new Date(v('date')).toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'}) : '';
+  const r = {
+    sno, date: dateStr,
+    name:     v('from_name')    || '—',
+    words:    v('amount_words') || '—',
+    amount:   v('amount_num')   || '0',
+    payMode:  v('pay_mode')     || 'Cash',
+    cheque:   v('cheque_no')    || '—',
+    bank:     v('bank')         || '—',
+    branch:   v('branch')       || '—',
+    plotNo:   v('plot_no')      || '—',
+    landSize: v('land_size')    || '—',
+    venture:  v('venture')      || '—',
+  };
+
+  buildPDF(r).save('Swargaseema_Receipt_' + sno + '.pdf');
+
+  // Increment serial
+  localStorage.setItem(SNO_KEY, snoNum + 1);
   refreshSno();
 
-  function v(id) { return document.getElementById(id).value.trim(); }
-
-  // ── Preview ──
-  function generateReceipt() {
-    const sno     = fmtSno(curSno());
-    const dateStr = v('date') ? new Date(v('date')).toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'}) : '';
-    const num     = v('amount_num');
-
-    document.getElementById('r-sno').textContent     = sno;
-    document.getElementById('r-date').textContent    = dateStr;
-    document.getElementById('r-from').textContent    = v('from_name')    || '_______________';
-    document.getElementById('r-words').textContent   = v('amount_words') || '_______________';
-    document.getElementById('r-paymode').textContent = v('pay_mode')     || 'Cash';
-    document.getElementById('r-cheque').textContent  = v('cheque_no')    || '—';
-    document.getElementById('r-bank').textContent    = v('bank')         || '—';
-    document.getElementById('r-branch').textContent  = v('branch')       || '—';
-    document.getElementById('r-plot').textContent    = v('plot_no')      || '—';
-    document.getElementById('r-size').textContent    = v('land_size')    || '—';
-    document.getElementById('r-venture').textContent = v('venture')      || '—';
-    document.getElementById('r-amount').textContent  = num
-      ? 'Rs. ' + parseFloat(num).toLocaleString('en-IN', {minimumFractionDigits:2})
-      : '_______________';
-
-    document.getElementById('receipt-preview').style.display = 'block';
-    setTimeout(() => document.getElementById('receipt-preview').scrollIntoView({behavior:'smooth', block:'start'}), 50);
+  // Save to Google Sheets
+  const ss = document.getElementById('sheets-status');
+  ss.className = 'saving'; ss.innerHTML = '&#9203;&nbsp; Saving to Google Sheets...';
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(r)
+    });
+    ss.className = 'saved';
+    ss.innerHTML = '&#10003;&nbsp; Saved to Google Sheets &mdash; Receipt #' + sno;
+    setTimeout(() => { ss.style.display = 'none'; }, 6000);
+    showToast('Receipt #' + sno + ' saved!');
+  } catch {
+    ss.className = 'failed';
+    ss.innerHTML = '&#10005;&nbsp; Could not save to Google Sheets.';
+    showToast('Sheets save failed', true);
   }
 
-  // ── Download + Save ──
-  async function downloadAndSave() {
-    const btn = document.getElementById('dl-btn');
-    btn.disabled = true; btn.textContent = 'Generating...';
+  btn.disabled = false;
+  btn.innerHTML = '&#8595; Download PDF &amp; Save to Sheets';
+}
 
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a5'});
+// ─────────────────────────────────────
+//  CLEAR FORM
+// ─────────────────────────────────────
+function clearForm() {
+  ['from_name','amount_words','amount_num','cheque_no','bank','branch','plot_no','land_size','venture']
+    .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('pay_mode').selectedIndex = 0;
+  document.getElementById('date').valueAsDate = new Date();
+  document.getElementById('receipt-preview').style.display = 'none';
+  const ss = document.getElementById('sheets-status');
+  ss.className = ''; ss.style.display = 'none';
+}
 
-    const snoNum   = curSno();
-    const sno      = fmtSno(snoNum);
-    const dateStr  = v('date') ? new Date(v('date')).toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'}) : '';
-    const fromName = v('from_name')    || '—';
-    const words    = v('amount_words') || '—';
-    const num      = v('amount_num')   || '';
-    const payMode  = v('pay_mode')     || 'Cash';
-    const cheque   = v('cheque_no')    || '—';
-    const bank     = v('bank')         || '—';
-    const branch   = v('branch')       || '—';
-    const plotNo   = v('plot_no')      || '—';
-    const landSize = v('land_size')    || '—';
-    const venture  = v('venture')      || '—';
+// ─────────────────────────────────────
+//  HISTORY — LOAD FROM SHEET
+// ─────────────────────────────────────
+let allReceipts = [];
 
-    const W = 148, mg = 12;
-    let y = 14;
+async function loadHistory() {
+  const syncBtn = document.getElementById('sync-btn');
+  syncBtn.className = 'sync-badge loading'; syncBtn.textContent = '⟳ Syncing...';
 
-    doc.setFillColor(107,26,46); doc.rect(mg, y-6, W-mg*2, 1.5, 'F');
+  document.getElementById('history-loading').style.display = 'block';
+  document.getElementById('history-table').style.display   = 'none';
+  document.getElementById('history-empty').style.display   = 'none';
 
-    doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.setTextColor(107,26,46);
-    doc.text('SWARGASEEMA', mg, y+2);
-    doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(80,80,80);
-    doc.text('SANDALWOOD FARMS PVT. LTD.', mg, y+7);
-    doc.setFontSize(6.5); doc.setTextColor(140,140,140); doc.text('add big results...', mg, y+11);
-    doc.setFontSize(6.5); doc.setTextColor(90,90,90);
-    ['Unit # S-7, Second Floor, Fantasy Square Complex,',
-     'Gachibowli, Hyderabad - 500032',
-     'Mob: 9849012500, 9848661666',
-     'Email: swargaseemasandalwood@gmail.com | Web: www.swargaseema.com'
-    ].forEach((l,i) => doc.text(l, mg, y+16+i*4));
+  try {
+    const res  = await fetch(SCRIPT_URL + '?action=getAll');
+    const data = await res.json();
 
-    doc.setFillColor(107,26,46); doc.roundedRect(W-mg-34, y-4, 34, 12, 2, 2, 'F');
-    doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(255,255,255);
-    doc.text('RECEIPT', W-mg-17, y+4.5, {align:'center'});
-    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(107,26,46);
-    doc.text('S. No.  '+sno, W-mg, y+14, {align:'right'});
-    doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(90,90,90);
-    doc.text(dateStr, W-mg, y+19, {align:'right'});
-
-    y += 38;
-    doc.setDrawColor(180,160,130); doc.setLineWidth(0.5); doc.line(mg, y, W-mg, y);
-    y += 8;
-
-    const dline = (lbl, val) => {
-      doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(60,60,60); doc.text(lbl, mg, y);
-      const lw = doc.getTextWidth(lbl);
-      doc.setFont('helvetica','bold'); doc.setTextColor(20,20,20); doc.text(val, mg+lw+1, y);
-      doc.setDrawColor(100,100,100); doc.setLineWidth(0.3);
-      doc.line(mg+lw+1, y+1, mg+lw+1+Math.max(doc.getTextWidth(val), 40), y+1);
-      y += 8;
-    };
-
-    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(60,60,60);
-    doc.text('Received with thanks a sum of Rupees', mg, y); y += 7;
-    doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(20,20,20);
-    doc.text(words + '  only', mg, y);
-    doc.setDrawColor(100,100,100); doc.setLineWidth(0.3); doc.line(mg, y+1, W-mg, y+1);
-    y += 9;
-
-    dline('from Sri/Smt/Kum  ', fromName);
-    dline('by ' + payMode + ' / Cheque No.  ', cheque);
-
-    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(60,60,60); doc.text('Drawn on  ', mg, y);
-    const bLw = doc.getTextWidth('Drawn on  ');
-    doc.setFont('helvetica','bold'); doc.setTextColor(20,20,20); doc.text(bank, mg+bLw+1, y);
-    doc.setDrawColor(100,100,100); doc.setLineWidth(0.3); doc.line(mg+bLw+1, y+1, mg+bLw+1+Math.max(doc.getTextWidth(bank),28), y+1);
-    const ab = mg+bLw+1+Math.max(doc.getTextWidth(bank),28)+3;
-    doc.setFont('helvetica','normal'); doc.setTextColor(60,60,60); doc.text('Bank,  ', ab, y);
-    doc.setFont('helvetica','bold'); doc.setTextColor(20,20,20); doc.text(branch, ab+doc.getTextWidth('Bank,  ')+1, y);
-    doc.text(' Branch', ab+doc.getTextWidth('Bank,  ')+1+doc.getTextWidth(branch), y);
-    y += 9;
-
-    dline('Plot No.  ', plotNo);
-    dline('Plot/Farm Land Size  ', landSize);
-    dline('Venture  ', venture);
-
-    y += 4;
-    doc.setFillColor(253,248,240); doc.roundedRect(mg, y, W-mg*2, 14, 2, 2, 'F');
-    doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(107,26,46);
-    doc.text('Rs.', mg+4, y+9.5);
-    doc.setFontSize(15); doc.setTextColor(20,20,20);
-    doc.text(num ? parseFloat(num).toLocaleString('en-IN',{minimumFractionDigits:2}) : '—', mg+18, y+9.5);
-    y += 18;
-
-    doc.setFont('helvetica','italic'); doc.setFontSize(7.5); doc.setTextColor(150,150,150);
-    doc.text('Subject to realization of cheque', mg, y); y += 14;
-
-    doc.setDrawColor(180,160,130); doc.setLineWidth(0.4); doc.line(mg, y, W-mg, y); y += 8;
-    doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(80,80,80); doc.text('For', W-mg-62, y);
-    doc.setFont('helvetica','bold'); doc.setTextColor(107,26,46); doc.text('Swargaseema Sandalwood Farms Pvt. Ltd.,', W-mg-55, y);
-    y += 14;
-    doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(80,80,80); doc.text('Authorised Signatory', W-mg-39, y);
-    doc.setFillColor(107,26,46); doc.rect(mg, y+6, W-mg*2, 1, 'F');
-
-    doc.save('Swargaseema_Receipt_' + sno + '.pdf');
-
-    // Increment serial
-    localStorage.setItem(SNO_KEY, snoNum + 1);
-    refreshSno();
-
-    // Save to Google Sheets
-    const ss = document.getElementById('sheets-status');
-    ss.className = 'saving'; ss.innerHTML = '&#9203;&nbsp; Saving to Google Sheets...';
-    try {
-      await fetch(SCRIPT_URL, {
-        method: 'POST', mode: 'no-cors',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({sno, date:dateStr, name:fromName, amount:num||'0',
-          words, payMode, cheque, bank, branch, plotNo, landSize, venture})
-      });
-      ss.className = 'saved';
-      ss.innerHTML = '&#10003;&nbsp; Saved to Google Sheets &mdash; Receipt #' + sno;
-      setTimeout(() => { ss.style.display = 'none'; }, 6000);
-      showToast('Receipt #' + sno + ' saved!');
-    } catch {
-      ss.className = 'failed';
-      ss.innerHTML = '&#10005;&nbsp; Could not save to Google Sheets.';
-      showToast('Sheets save failed', true);
+    if (data.rows && data.rows.length > 0) {
+      allReceipts = data.rows;
+      // Auto-sync serial to sheet count + 1
+      localStorage.setItem(SNO_KEY, allReceipts.length + 1);
+      refreshSno();
+      renderHistory(allReceipts);
+      syncBtn.className = 'sync-badge'; syncBtn.textContent = '✓ Synced';
+      setTimeout(() => { syncBtn.textContent = '⟳ Sync'; }, 3000);
+    } else {
+      allReceipts = [];
+      renderHistory([]);
+      syncBtn.className = 'sync-badge'; syncBtn.textContent = '⟳ Sync';
     }
+  } catch(e) {
+    document.getElementById('history-loading').style.display = 'none';
+    document.getElementById('history-empty').style.display = 'block';
+    document.getElementById('history-empty').innerHTML = '<div class="icon">⚠️</div>Could not load data. Check your network.';
+    syncBtn.className = 'sync-badge error'; syncBtn.textContent = '✗ Failed';
+    setTimeout(() => { syncBtn.className = 'sync-badge'; syncBtn.textContent = '⟳ Sync'; }, 4000);
+    showToast('Could not load history', true);
+  }
+}
 
-    btn.disabled = false;
-    btn.innerHTML = '&#8595; Download PDF &amp; Save to Sheets';
+function renderHistory(rows) {
+  document.getElementById('history-loading').style.display = 'none';
+
+  if (rows.length === 0) {
+    document.getElementById('history-table').style.display = 'none';
+    document.getElementById('history-empty').style.display = 'block';
+    document.getElementById('history-empty').innerHTML = '<div class="icon">📄</div>No receipts found.';
+    document.getElementById('stat-total').textContent = '0';
+    document.getElementById('stat-amount').textContent = '₹0';
+    return;
   }
 
-  // ── Clear ──
-  function clearForm() {
-    ['from_name','amount_words','amount_num','cheque_no','bank','branch','plot_no','land_size','venture']
-      .forEach(id => document.getElementById(id).value = '');
-    document.getElementById('pay_mode').selectedIndex = 0;
-    document.getElementById('date').valueAsDate = new Date();
-    document.getElementById('receipt-preview').style.display = 'none';
-    const ss = document.getElementById('sheets-status');
-    ss.className = ''; ss.style.display = 'none';
-  }
+  document.getElementById('history-empty').style.display = 'none';
+  document.getElementById('history-table').style.display = 'table';
+
+  // Stats
+  const total = rows.length;
+  const totalAmt = rows.reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0);
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-amount').textContent = '₹' + totalAmt.toLocaleString('en-IN', {minimumFractionDigits:0});
+
+  // Rows
+  const tbody = document.getElementById('history-tbody');
+  tbody.innerHTML = rows.map((r, idx) => `
+    <tr>
+      <td class="sno-cell">${r.sno || idx+1}</td>
+      <td>${r.date || '—'}</td>
+      <td>${r.name || '—'}</td>
+      <td>${r.plotNo || '—'}</td>
+      <td>${r.venture || '—'}</td>
+      <td>${r.payMode || '—'}</td>
+      <td class="amount-cell">₹${parseFloat(r.amount||0).toLocaleString('en-IN',{minimumFractionDigits:0})}</td>
+      <td><button class="btn-icon btn-sm" onclick="downloadHistoryReceipt(${idx})">&#8595; PDF</button></td>
+    </tr>
+  `).join('');
+}
+
+function filterHistory() {
+  const q      = document.getElementById('search-input').value.toLowerCase();
+  const mode   = document.getElementById('filter-mode').value.toLowerCase();
+  const filtered = allReceipts.filter(r => {
+    const matchQ = !q ||
+      (r.name||'').toLowerCase().includes(q) ||
+      (r.plotNo||'').toLowerCase().includes(q) ||
+      (r.venture||'').toLowerCase().includes(q) ||
+      (r.sno||'').toLowerCase().includes(q);
+    const matchMode = !mode || (r.payMode||'').toLowerCase().includes(mode);
+    return matchQ && matchMode;
+  });
+  renderHistory(filtered);
+}
+
+function downloadHistoryReceipt(idx) {
+  const r = allReceipts[idx];
+  if (!r) return;
+  buildPDF(r).save('Swargaseema_Receipt_' + (r.sno || idx+1) + '.pdf');
+  showToast('Downloaded Receipt #' + (r.sno || idx+1));
+}
 </script>
 </body>
 </html>
