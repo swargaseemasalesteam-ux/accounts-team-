@@ -198,6 +198,8 @@ tbody td{padding:11px 14px;color:var(--dk);vertical-align:middle}
       <option value="">All Payment Modes</option>
       <option>Cash</option><option>Card</option><option>Cheque</option><option>Online / NEFT</option>
     </select>
+    <input type="date" id="hdfrom" onchange="filterH()" title="From date" style="width:140px">
+    <input type="date" id="hdto" onchange="filterH()" title="To date" style="width:140px">
     <button class="bs bsm" onclick="loadHistory()">&#8635; Refresh</button>
   </div>
   <div class="tw">
@@ -254,12 +256,19 @@ function gv(id) { var e = document.getElementById(id); return e ? e.value.trim()
 
 function fmtD(val) {
   if(!val) return '';
-  var s = String(val);
-  // strip time portion if present
-  s = s.split(' ')[0].split('T')[0];
-  var d = new Date(s + 'T00:00:00');
-  if(isNaN(d)) return val;
-  return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  var s = String(val).trim();
+  // Handle "Wed Mar 18 2026 00:00:00 GMT+0530 (India Standard Time)" format
+  var d = new Date(s);
+  if(!isNaN(d.getTime())) {
+    return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric',timeZone:'Asia/Kolkata'});
+  }
+  // Handle plain date string YYYY-MM-DD
+  var parts = s.split(/[-\/]/);
+  if(parts.length === 3) {
+    d = new Date(parts[0]+'-'+parts[1]+'-'+parts[2]+'T00:00:00');
+    if(!isNaN(d.getTime())) return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  }
+  return s;
 }
 
 function fmtA(n) {
@@ -402,7 +411,7 @@ function renderH(rows) {
   document.getElementById('hload').style.display='none';
   document.getElementById('stotal').textContent=rows.length;
   var ta=rows.reduce(function(s,r){ return s+(parseFloat(r.amount)||0); },0);
-  document.getElementById('samt').textContent='&#8377;'+ta.toLocaleString('en-IN',{minimumFractionDigits:0});
+  document.getElementById('samt').innerHTML='&#8377;'+ta.toLocaleString('en-IN',{minimumFractionDigits:0});
   if(!rows.length){ document.getElementById('htable').style.display='none'; document.getElementById('hempty').style.display='block'; return; }
   document.getElementById('hempty').style.display='none';
   document.getElementById('htable').style.display='table';
@@ -414,9 +423,20 @@ function renderH(rows) {
 window.filterH = function() {
   var q=document.getElementById('hsearch').value.toLowerCase();
   var m=document.getElementById('hmode').value.toLowerCase();
+  var df=document.getElementById('hdfrom').value;
+  var dt=document.getElementById('hdto').value;
   renderH(allR.filter(function(r){
-    return (!q||(r.name||'').toLowerCase().includes(q)||(r.plotNo||'').toLowerCase().includes(q)||(r.venture||'').toLowerCase().includes(q)||(r.sno||'').toLowerCase().includes(q))
-      && (!m||(r.payMode||'').toLowerCase().includes(m));
+    var matchQ = !q||(r.name||'').toLowerCase().includes(q)||(r.plotNo||'').toLowerCase().includes(q)||(r.venture||'').toLowerCase().includes(q)||(r.sno||'').toLowerCase().includes(q);
+    var matchM = !m||(r.payMode||'').toLowerCase().includes(m);
+    var matchD = true;
+    if(df || dt) {
+      var rd = new Date(r.date);
+      if(!isNaN(rd.getTime())) {
+        if(df) matchD = matchD && rd >= new Date(df+'T00:00:00');
+        if(dt) matchD = matchD && rd <= new Date(dt+'T23:59:59');
+      }
+    }
+    return matchQ && matchM && matchD;
   }));
 };
 
