@@ -300,50 +300,76 @@ function buildPDF(r) {
   var J = window.jspdf || window.jspdf;
   var doc = new J.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
   var W=297, mg=16, y=16;
-  doc.setFillColor(107,26,46); doc.rect(mg,y-6,W-mg*2,1.5,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.setTextColor(107,26,46);
-  doc.text('SWARGASEEMA',mg,y+2);
-  doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(80,80,80);
-  doc.text('SANDALWOOD FARMS PVT. LTD.',mg,y+7);
-  doc.setFontSize(6.5); doc.setTextColor(140,140,140); doc.text('add big results...',mg,y+11);
-  doc.setFontSize(6.5); doc.setTextColor(90,90,90);
-  doc.text('Unit S-7, Fantasy Square Complex, Gachibowli, Hyderabad-500032',mg,y+16);
-  doc.text('Mob: 9849012500, 9848661666',mg,y+20);
-  doc.setFillColor(107,26,46); doc.roundedRect(W-mg-34,y-4,34,12,2,2,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(255,255,255);
-  doc.text('RECEIPT',W-mg-17,y+4.5,{align:'center'});
-  doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(107,26,46);
-  doc.text('S. No.  '+(r.sno||''),W-mg,y+14,{align:'right'});
-  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(90,90,90);
-  doc.text(r.date||'',W-mg,y+19,{align:'right'});
-  y+=32;
-  doc.setDrawColor(180,160,130); doc.setLineWidth(0.5); doc.line(mg,y,W-mg,y); y+=8;
-  function dl(lbl,val) {
-    val=val||'—';
-    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(60,60,60); doc.text(lbl,mg,y);
-    var lw=doc.getTextWidth(lbl);
-    doc.setFont('helvetica','bold'); doc.setTextColor(20,20,20); doc.text(val,mg+lw+1,y);
-    doc.setDrawColor(100,100,100); doc.setLineWidth(0.3);
-    doc.line(mg+lw+1,y+1,mg+lw+1+Math.max(doc.getTextWidth(val),40),y+1);
-    y+=8;
+
+  // Fix date — strip GMT string if present
+  var rdate = r.date || '';
+  if(rdate.indexOf('GMT') !== -1 || rdate.indexOf('Standard') !== -1) {
+    var d = new Date(rdate);
+    rdate = isNaN(d.getTime()) ? rdate : d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric',timeZone:'Asia/Kolkata'});
   }
-  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(60,60,60);
-  doc.text('Received with thanks a sum of Rupees',mg,y); y+=7;
-  doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(20,20,20);
+
+  doc.setFillColor(107,26,46); doc.rect(mg,y-6,W-mg*2,2,'F');
+  // Company name — bigger
+  doc.setFont('helvetica','bold'); doc.setFontSize(22); doc.setTextColor(107,26,46);
+  doc.text('SWARGASEEMA',mg,y+4);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(80,80,80);
+  doc.text('SANDALWOOD FARMS PVT. LTD.',mg,y+10);
+  doc.setFontSize(8); doc.setTextColor(140,140,140); doc.text('add big results...',mg,y+15);
+  doc.setFontSize(8); doc.setTextColor(90,90,90);
+  doc.text('Unit S-7, Fantasy Square Complex, Gachibowli, Hyderabad-500032',mg,y+21);
+  doc.text('Mob: 9849012500, 9848661666',mg,y+26);
+
+  // Receipt badge — bigger
+  doc.setFillColor(107,26,46); doc.roundedRect(W-mg-46,y-4,46,16,2,2,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(255,255,255);
+  doc.text('RECEIPT',W-mg-23,y+7,{align:'center'});
+  doc.setFont('helvetica','bold'); doc.setFontSize(14); doc.setTextColor(107,26,46);
+  doc.text('S. No.  '+(r.sno||''),W-mg,y+18,{align:'right'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(90,90,90);
+  doc.text(rdate,W-mg,y+25,{align:'right'});
+
+  y+=38;
+  doc.setDrawColor(180,160,130); doc.setLineWidth(0.5); doc.line(mg,y,W-mg,y); y+=10;
+
+  // dl helper — font size 11
+  function dl(lbl,val,xpos) {
+    val=val||'—'; xpos=xpos||mg;
+    doc.setFont('helvetica','normal'); doc.setFontSize(11); doc.setTextColor(60,60,60); doc.text(lbl,xpos,y);
+    var lw=doc.getTextWidth(lbl);
+    doc.setFont('helvetica','bold'); doc.setTextColor(20,20,20); doc.text(val,xpos+lw+1,y);
+    doc.setDrawColor(100,100,100); doc.setLineWidth(0.3);
+    doc.line(xpos+lw+1,y+1,xpos+lw+1+Math.max(doc.getTextWidth(val),40),y+1);
+  }
+
+  // Amount words row
+  doc.setFont('helvetica','normal'); doc.setFontSize(11); doc.setTextColor(60,60,60);
+  doc.text('Received with thanks a sum of Rupees',mg,y); y+=8;
+  doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(20,20,20);
   doc.text((r.words||'—')+'  only',mg,y);
-  doc.setDrawColor(100,100,100); doc.setLineWidth(0.3); doc.line(mg,y+1,W-mg,y+1); y+=9;
-  dl('from Sri/Smt/Kum  ',r.name);
-  dl('by '+(r.payMode||'Cash')+' / Cheque No.  ',r.cheque);
+  doc.setDrawColor(100,100,100); doc.setLineWidth(0.3); doc.line(mg,y+1,W-mg,y+1); y+=10;
+
+  // From
+  dl('from Sri/Smt/Kum  ',r.name); y+=10;
+  // Cheque
+  dl('by '+(r.payMode||'Cash')+' / Cheque No.  ',r.cheque); y+=10;
+
+  // Bank / Branch row
   var bk=r.bank||'—', br2=r.branch||'—';
-  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(60,60,60); doc.text('Drawn on  ',mg,y);
+  doc.setFont('helvetica','normal'); doc.setFontSize(11); doc.setTextColor(60,60,60); doc.text('Drawn on  ',mg,y);
   var bLw=doc.getTextWidth('Drawn on  ');
   doc.setFont('helvetica','bold'); doc.setTextColor(20,20,20); doc.text(bk,mg+bLw+1,y);
-  doc.setDrawColor(100,100,100); doc.setLineWidth(0.3); doc.line(mg+bLw+1,y+1,mg+bLw+1+Math.max(doc.getTextWidth(bk),28),y+1);
-  var ab=mg+bLw+1+Math.max(doc.getTextWidth(bk),28)+3;
+  doc.setDrawColor(100,100,100); doc.setLineWidth(0.3); doc.line(mg+bLw+1,y+1,mg+bLw+1+Math.max(doc.getTextWidth(bk),30),y+1);
+  var ab=mg+bLw+1+Math.max(doc.getTextWidth(bk),30)+4;
   doc.setFont('helvetica','normal'); doc.setTextColor(60,60,60); doc.text('Bank,  ',ab,y);
   doc.setFont('helvetica','bold'); doc.setTextColor(20,20,20); doc.text(br2,ab+doc.getTextWidth('Bank,  ')+1,y);
-  doc.text(' Branch',ab+doc.getTextWidth('Bank,  ')+1+doc.getTextWidth(br2),y); y+=9;
-  dl('Plot No.  ',r.plotNo); dl('Plot/Farm Land Size  ',r.landSize); dl('Venture  ',r.venture);
+  doc.text(' Branch',ab+doc.getTextWidth('Bank,  ')+1+doc.getTextWidth(br2),y); y+=10;
+
+  // Plot No | Land Size | Venture — all on ONE line side by side
+  var col1=mg, col2=mg+85, col3=mg+175;
+  dl('Plot No.  ',r.plotNo,col1);
+  dl('Plot/Farm Land Size  ',r.landSize,col2);
+  dl('Venture  ',r.venture,col3);
+  y+=10;
   y+=4;
   doc.setFillColor(253,248,240); doc.roundedRect(mg,y,W-mg*2,14,2,2,'F');
   doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(107,26,46); doc.text('Rs.',mg+4,y+9.5);
