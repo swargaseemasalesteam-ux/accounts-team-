@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swargaseema Receipt Generator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@300;400;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --maroon: #6b1a2e; --maroon-light: #8b2442; --gold: #c9a84c;
+    --cream: #fdf8f0; --dark: #1a1a1a; --mid: #555; --border: #d4c4a0;
+    --bg: #f5f0e8; --green: #1a6b3a; --green-light: #e8f5ed;
+  }
+  body {
+    font-family: 'Source Sans 3', sans-serif; background: var(--bg);
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; padding: 28px 16px 60px;
+    background-image: radial-gradient(ellipse at 20% 20%, rgba(107,26,46,0.06) 0%, transparent 55%),
+                      radial-gradient(ellipse at 80% 80%, rgba(201,168,76,0.06) 0%, transparent 55%);
+  }
+  header { text-align: center; margin-bottom: 24px; }
+  header h1 { font-family: 'Playfair Display', serif; font-size: 1.9rem; color: var(--maroon); }
+  header p { color: var(--mid); font-size: 0.88rem; margin-top: 5px; font-weight: 300; }
+
+  .container { width: 100%; max-width: 780px; display: flex; flex-direction: column; gap: 18px; }
+
+  .card {
+    background: white; border-radius: 12px; padding: 26px 30px;
+    box-shadow: 0 3px 18px rgba(107,26,46,0.07), 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .card h2 {
+    font-family: 'Playfair Display', serif; font-size: 1rem;
+    color: var(--maroon); margin-bottom: 16px; padding-bottom: 10px;
+    border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px;
+  }
+  .card h2::before { content: ''; display: inline-block; width: 4px; height: 15px; background: var(--gold); border-radius: 2px; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group.full { grid-column: span 2; }
+  label { font-size: 0.74rem; font-weight: 600; color: var(--maroon); letter-spacing: 0.05em; text-transform: uppercase; }
+  input, select {
+    border: 1.5px solid var(--border); border-radius: 7px; padding: 9px 12px;
+    font-family: 'Source Sans 3', sans-serif; font-size: 0.92rem; color: var(--dark);
+    background: var(--cream); outline: none; transition: border-color 0.18s, box-shadow 0.18s;
+  }
+  input:focus, select:focus { border-color: var(--maroon); box-shadow: 0 0 0 3px rgba(107,26,46,0.07); background: white; }
+  input[readonly] { background: #f0e8e8; color: var(--maroon); font-weight: 700; cursor: default; }
+
+  .sno-row { display: flex; gap: 8px; align-items: center; }
+  .sno-row input { width: 90px; text-align: center; font-size: 1.1rem; }
+  .btn-reset { background: none; border: 1.5px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 0.78rem; color: var(--mid); cursor: pointer; white-space: nowrap; font-family: 'Source Sans 3', sans-serif; }
+  .btn-reset:hover { border-color: var(--maroon); color: var(--maroon); }
+
+  .amount-row { display: flex; align-items: center; gap: 8px; }
+  .amount-sym { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--maroon); font-weight: 700; }
+  .amount-row input { flex: 1; font-size: 1.1rem; font-weight: 600; color: var(--maroon); }
+
+  .btn-row { display: flex; gap: 12px; justify-content: center; margin-top: 22px; flex-wrap: wrap; }
+  button { font-family: 'Source Sans 3', sans-serif; font-size: 0.92rem; font-weight: 600; letter-spacing: 0.03em; padding: 11px 26px; border-radius: 8px; border: none; cursor: pointer; transition: all 0.18s; }
+  .btn-primary { background: linear-gradient(135deg, var(--maroon), var(--maroon-light)); color: white; box-shadow: 0 4px 14px rgba(107,26,46,0.22); }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(107,26,46,0.3); }
+  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .btn-secondary { background: var(--cream); color: var(--maroon); border: 1.5px solid var(--border); }
+  .btn-secondary:hover { background: white; border-color: var(--maroon); }
+
+  /* Sheets status */
+  #sheets-status {
+    display: none; width: 100%; max-width: 780px;
+    padding: 10px 16px; border-radius: 8px; font-size: 0.82rem; align-items: center; gap: 8px; margin-top: 6px;
+  }
+  #sheets-status.saving { display: flex; background: #e8f0ff; color: #1a3a8a; }
+  #sheets-status.saved  { display: flex; background: var(--green-light); color: var(--green); }
+  #sheets-status.failed { display: flex; background: #ffeaea; color: #8a1a1a; }
+
+  /* Receipt preview */
+  #receipt-preview { display: none; width: 100%; max-width: 780px; margin-top: 18px; }
+  .receipt-paper {
+    background: white; border-radius: 10px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.1);
+    padding: 32px 36px; font-family: Arial, Helvetica, sans-serif;
+    font-size: 12.5px; color: #1a1a1a;
+  }
+  .receipt-top { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #333; padding-bottom: 14px; margin-bottom: 14px; }
+  .r-brand { font-size: 20px; font-weight: 900; color: #6b1a2e; letter-spacing: 1px; }
+  .r-sub { font-size: 8px; letter-spacing: 2px; color: #555; text-transform: uppercase; }
+  .r-tag { font-size: 8px; color: #aaa; font-style: italic; margin-top: 2px; }
+  .r-addr { font-size: 9px; color: #666; margin-top: 7px; line-height: 1.55; }
+  .r-badge { background: #6b1a2e; color: white; font-size: 16px; font-weight: 900; letter-spacing: 3px; padding: 7px 20px; border-radius: 4px; }
+  .r-sno-blk { text-align: right; margin-top: 7px; }
+  .r-sno-val { font-size: 16px; font-weight: 700; color: #6b1a2e; }
+  .r-date-val { font-size: 10px; color: #888; margin-top: 3px; }
+  .r-line { margin-bottom: 12px; line-height: 1.9; }
+  .uv { border-bottom: 1px solid #333; display: inline-block; min-width: 170px; padding: 0 3px; font-weight: 600; }
+  .r-amt-row { display: flex; align-items: baseline; gap: 10px; margin: 16px 0 4px; }
+  .r-rs { font-size: 20px; font-weight: 900; color: #6b1a2e; }
+  .r-amt { font-size: 18px; font-weight: 700; border-bottom: 2px solid #333; min-width: 170px; padding-bottom: 2px; }
+  .r-note { font-size: 9px; color: #aaa; }
+  .r-footer { display: flex; justify-content: flex-end; margin-top: 36px; padding-top: 10px; border-top: 1px solid #ccc; }
+  .sig-blk { text-align: center; font-size: 10.5px; color: #555; }
+  .sig-co { font-weight: 700; color: #6b1a2e; font-size: 11px; }
+  .dl-row { display: flex; justify-content: center; gap: 14px; margin-top: 16px; flex-wrap: wrap; }
+
+  /* Toast */
+  #toast {
+    position: fixed; bottom: 26px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #1a3a1a; color: white; padding: 11px 22px;
+    border-radius: 8px; font-size: 0.86rem; font-weight: 600;
+    transition: transform 0.28s ease; z-index: 999; white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+  #toast.err { background: #6b1a2e; }
+
+  @media (max-width: 560px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .form-group.full { grid-column: span 1; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Swargaseema Receipt Generator</h1>
+  <p>Fill details &rarr; Preview &rarr; Download PDF &rarr; Auto-saved to Google Sheets</p>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h2>Receipt Details</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Serial Number</label>
+        <div class="sno-row">
+          <input type="text" id="sno" readonly>
+          <button class="btn-reset" onclick="resetSno()">&#x21BA; Reset</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="date">
+      </div>
+      <div class="form-group full">
+        <label>Received From (Sri / Smt / Kum)</label>
+        <input type="text" id="from_name" placeholder="Full name of payer">
+      </div>
+      <div class="form-group full">
+        <label>Amount in Words</label>
+        <input type="text" id="amount_words" placeholder="e.g. Fifty Thousand Rupees Only">
+      </div>
+      <div class="form-group full">
+        <label>Amount (Rs.)</label>
+        <div class="amount-row">
+          <span class="amount-sym">&#8377;</span>
+          <input type="number" id="amount_num" placeholder="0.00" min="0">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Payment Details</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Payment Mode</label>
+        <select id="pay_mode">
+          <option>Cash</option>
+          <option>Card</option>
+          <option>Cheque</option>
+          <option>Online / NEFT</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Cheque / Transaction No.</label>
+        <input type="text" id="cheque_no" placeholder="If applicable">
+      </div>
+      <div class="form-group">
+        <label>Bank</label>
+        <input type="text" id="bank" placeholder="Bank name">
+      </div>
+      <div class="form-group">
+        <label>Branch</label>
+        <input type="text" id="branch" placeholder="Branch name">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Property Details</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Plot No.</label>
+        <input type="text" id="plot_no" placeholder="e.g. A-42">
+      </div>
+      <div class="form-group">
+        <label>Plot / Farm Land Size</label>
+        <input type="text" id="land_size" placeholder="e.g. 200 sq.yds">
+      </div>
+      <div class="form-group full">
+        <label>Venture Name</label>
+        <input type="text" id="venture" placeholder="e.g. Green Valley Phase 2">
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="clearForm()">Clear</button>
+      <button class="btn-primary" onclick="generateReceipt()">Preview Receipt &#8595;</button>
+    </div>
+  </div>
+
+</div>
+
+<div id="sheets-status"></div>
+
+<!-- Receipt Preview -->
+<div id="receipt-preview">
+  <div class="receipt-paper">
+    <div class="receipt-top">
+      <div>
+        <div class="r-brand">SWARGASEEMA</div>
+        <div class="r-sub">Sandalwood Farms Pvt. Ltd.</div>
+        <div class="r-tag">add big results...</div>
+        <div class="r-addr">
+          Unit # S-7, Second Floor, Fantasy Square Complex,<br>
+          Gachibowli, Hyderabad - 500032<br>
+          Mob: 9849012500, 9848661666<br>
+          Email: swargaseemasandalwood@gmail.com &nbsp;|&nbsp; Web: www.swargaseema.com
+        </div>
+      </div>
+      <div>
+        <div class="r-badge">RECEIPT</div>
+        <div class="r-sno-blk">
+          <div class="r-sno-val">S. No. &nbsp;<span id="r-sno"></span></div>
+          <div class="r-date-val" id="r-date"></div>
+        </div>
+      </div>
+    </div>
+    <div class="r-line">Received with thanks a sum of Rupees &nbsp;<span class="uv" id="r-words"></span>&nbsp; only</div>
+    <div class="r-line">from Sri/Smt/Kum &nbsp;<span class="uv" id="r-from"></span></div>
+    <div class="r-line">
+      by <span id="r-paymode"></span> / Cheque No.&nbsp;<span class="uv" id="r-cheque" style="min-width:90px;"></span>
+      &nbsp;Drawn on&nbsp;<span class="uv" id="r-bank" style="min-width:80px;"></span>&nbsp;Bank,
+      &nbsp;<span class="uv" id="r-branch" style="min-width:80px;"></span>&nbsp;Branch
+    </div>
+    <div class="r-line">
+      Plot No.&nbsp;<span class="uv" id="r-plot" style="min-width:60px;"></span>
+      &nbsp;&nbsp;Plot/Farm Land Size&nbsp;<span class="uv" id="r-size" style="min-width:90px;"></span>
+      &nbsp;&nbsp;Venture:&nbsp;<span class="uv" id="r-venture" style="min-width:110px;"></span>
+    </div>
+    <div class="r-amt-row">
+      <span class="r-rs">Rs.</span>
+      <span class="r-amt" id="r-amount"></span>
+    </div>
+    <div class="r-note">Subject to realization of cheque</div>
+    <div class="r-footer">
+      <div class="sig-blk">
+        <div style="height:36px;"></div>
+        <div>For &nbsp;<span class="sig-co">Swargaseema Sandalwood Farms Pvt. Ltd.,</span></div>
+        <div style="margin-top:5px;">Authorised Signatory</div>
+      </div>
+    </div>
+  </div>
+  <div class="dl-row">
+    <button class="btn-secondary" onclick="document.getElementById('receipt-preview').style.display='none'">&#8592; Edit</button>
+    <button class="btn-primary" id="dl-btn" onclick="downloadAndSave()">&#8595; Download PDF &amp; Save to Sheets</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  // ── Config ──
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxiWflUsq1uLmwXRJ-tJkKPFCfOEPa9mCp08mIqj0nuTuYVoMPd-GMAbDlVebSh324/exec';
+  const SNO_KEY    = 'swarga_sno_v2';
+
+  // ── Serial Number ──
+  function curSno()  { return parseInt(localStorage.getItem(SNO_KEY) || '1', 10); }
+  function fmtSno(n) { return String(n).padStart(3, '0'); }
+  function refreshSno() { document.getElementById('sno').value = fmtSno(curSno()); }
+  function resetSno() {
+    const n = prompt('Reset serial number to:', '1');
+    if (n && !isNaN(parseInt(n)) && parseInt(n) > 0) {
+      localStorage.setItem(SNO_KEY, parseInt(n));
+      refreshSno();
+      showToast('Serial reset to ' + fmtSno(parseInt(n)));
+    }
+  }
+
+  // ── Toast ──
+  let _tt;
+  function showToast(msg, isErr) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = 'show' + (isErr ? ' err' : '');
+    clearTimeout(_tt); _tt = setTimeout(() => { t.className = ''; }, 3000);
+  }
+
+  // ── Init ──
+  document.getElementById('date').valueAsDate = new Date();
+  refreshSno();
+
+  function v(id) { return document.getElementById(id).value.trim(); }
+
+  // ── Preview ──
+  function generateReceipt() {
+    const sno     = fmtSno(curSno());
+    const dateStr = v('date') ? new Date(v('date')).toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'}) : '';
+    const num     = v('amount_num');
+
+    document.getElementById('r-sno').textContent     = sno;
+    document.getElementById('r-date').textContent    = dateStr;
+    document.getElementById('r-from').textContent    = v('from_name')    || '_______________';
+    document.getElementById('r-words').textContent   = v('amount_words') || '_______________';
+    document.getElementById('r-paymode').textContent = v('pay_mode')     || 'Cash';
+    document.getElementById('r-cheque').textContent  = v('cheque_no')    || '—';
+    document.getElementById('r-bank').textContent    = v('bank')         || '—';
+    document.getElementById('r-branch').textContent  = v('branch')       || '—';
+    document.getElementById('r-plot').textContent    = v('plot_no')      || '—';
+    document.getElementById('r-size').textContent    = v('land_size')    || '—';
+    document.getElementById('r-venture').textContent = v('venture')      || '—';
+    document.getElementById('r-amount').textContent  = num
+      ? 'Rs. ' + parseFloat(num).toLocaleString('en-IN', {minimumFractionDigits:2})
+      : '_______________';
+
+    document.getElementById('receipt-preview').style.display = 'block';
+    setTimeout(() => document.getElementById('receipt-preview').scrollIntoView({behavior:'smooth', block:'start'}), 50);
+  }
+
+  // ── Download + Save ──
+  async function downloadAndSave() {
+    const btn = document.getElementById('dl-btn');
+    btn.disabled = true; btn.textContent = 'Generating...';
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a5'});
+
+    const snoNum   = curSno();
+    const sno      = fmtSno(snoNum);
+    const dateStr  = v('date') ? new Date(v('date')).toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'}) : '';
+    const fromName = v('from_name')    || '—';
+    const words    = v('amount_words') || '—';
+    const num      = v('amount_num')   || '';
+    const payMode  = v('pay_mode')     || 'Cash';
+    const cheque   = v('cheque_no')    || '—';
+    const bank     = v('bank')         || '—';
+    const branch   = v('branch')       || '—';
+    const plotNo   = v('plot_no')      || '—';
+    const landSize = v('land_size')    || '—';
+    const venture  = v('venture')      || '—';
+
+    const W = 148, mg = 12;
+    let y = 14;
+
+    doc.setFillColor(107,26,46); doc.rect(mg, y-6, W-mg*2, 1.5, 'F');
+
+    doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.setTextColor(107,26,46);
+    doc.text('SWARGASEEMA', mg, y+2);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(80,80,80);
+    doc.text('SANDALWOOD FARMS PVT. LTD.', mg, y+7);
+    doc.setFontSize(6.5); doc.setTextColor(140,140,140); doc.text('add big results...', mg, y+11);
+    doc.setFontSize(6.5); doc.setTextColor(90,90,90);
+    ['Unit # S-7, Second Floor, Fantasy Square Complex,',
+     'Gachibowli, Hyderabad - 500032',
+     'Mob: 9849012500, 9848661666',
+     'Email: swargaseemasandalwood@gmail.com | Web: www.swargaseema.com'
+    ].forEach((l,i) => doc.text(l, mg, y+16+i*4));
+
+    doc.setFillColor(107,26,46); doc.roundedRect(W-mg-34, y-4, 34, 12, 2, 2, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(255,255,255);
+    doc.text('RECEIPT', W-mg-17, y+4.5, {align:'center'});
+    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(107,26,46);
+    doc.text('S. No.  '+sno, W-mg, y+14, {align:'right'});
+    doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(90,90,90);
+    doc.text(dateStr, W-mg, y+19, {align:'right'});
+
+    y += 38;
+    doc.setDrawColor(180,160,130); doc.setLineWidth(0.5); doc.line(mg, y, W-mg, y);
+    y += 8;
+
+    const dline = (lbl, val) => {
+      doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(60,60,60); doc.text(lbl, mg, y);
+      const lw = doc.getTextWidth(lbl);
+      doc.setFont('helvetica','bold'); doc.setTextColor(20,20,20); doc.text(val, mg+lw+1, y);
+      doc.setDrawColor(100,100,100); doc.setLineWidth(0.3);
+      doc.line(mg+lw+1, y+1, mg+lw+1+Math.max(doc.getTextWidth(val), 40), y+1);
+      y += 8;
+    };
+
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(60,60,60);
+    doc.text('Received with thanks a sum of Rupees', mg, y); y += 7;
+    doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(20,20,20);
+    doc.text(words + '  only', mg, y);
+    doc.setDrawColor(100,100,100); doc.setLineWidth(0.3); doc.line(mg, y+1, W-mg, y+1);
+    y += 9;
+
+    dline('from Sri/Smt/Kum  ', fromName);
+    dline('by ' + payMode + ' / Cheque No.  ', cheque);
+
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(60,60,60); doc.text('Drawn on  ', mg, y);
+    const bLw = doc.getTextWidth('Drawn on  ');
+    doc.setFont('helvetica','bold'); doc.setTextColor(20,20,20); doc.text(bank, mg+bLw+1, y);
+    doc.setDrawColor(100,100,100); doc.setLineWidth(0.3); doc.line(mg+bLw+1, y+1, mg+bLw+1+Math.max(doc.getTextWidth(bank),28), y+1);
+    const ab = mg+bLw+1+Math.max(doc.getTextWidth(bank),28)+3;
+    doc.setFont('helvetica','normal'); doc.setTextColor(60,60,60); doc.text('Bank,  ', ab, y);
+    doc.setFont('helvetica','bold'); doc.setTextColor(20,20,20); doc.text(branch, ab+doc.getTextWidth('Bank,  ')+1, y);
+    doc.text(' Branch', ab+doc.getTextWidth('Bank,  ')+1+doc.getTextWidth(branch), y);
+    y += 9;
+
+    dline('Plot No.  ', plotNo);
+    dline('Plot/Farm Land Size  ', landSize);
+    dline('Venture  ', venture);
+
+    y += 4;
+    doc.setFillColor(253,248,240); doc.roundedRect(mg, y, W-mg*2, 14, 2, 2, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(107,26,46);
+    doc.text('Rs.', mg+4, y+9.5);
+    doc.setFontSize(15); doc.setTextColor(20,20,20);
+    doc.text(num ? parseFloat(num).toLocaleString('en-IN',{minimumFractionDigits:2}) : '—', mg+18, y+9.5);
+    y += 18;
+
+    doc.setFont('helvetica','italic'); doc.setFontSize(7.5); doc.setTextColor(150,150,150);
+    doc.text('Subject to realization of cheque', mg, y); y += 14;
+
+    doc.setDrawColor(180,160,130); doc.setLineWidth(0.4); doc.line(mg, y, W-mg, y); y += 8;
+    doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(80,80,80); doc.text('For', W-mg-62, y);
+    doc.setFont('helvetica','bold'); doc.setTextColor(107,26,46); doc.text('Swargaseema Sandalwood Farms Pvt. Ltd.,', W-mg-55, y);
+    y += 14;
+    doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(80,80,80); doc.text('Authorised Signatory', W-mg-39, y);
+    doc.setFillColor(107,26,46); doc.rect(mg, y+6, W-mg*2, 1, 'F');
+
+    doc.save('Swargaseema_Receipt_' + sno + '.pdf');
+
+    // Increment serial
+    localStorage.setItem(SNO_KEY, snoNum + 1);
+    refreshSno();
+
+    // Save to Google Sheets
+    const ss = document.getElementById('sheets-status');
+    ss.className = 'saving'; ss.innerHTML = '&#9203;&nbsp; Saving to Google Sheets...';
+    try {
+      await fetch(SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({sno, date:dateStr, name:fromName, amount:num||'0',
+          words, payMode, cheque, bank, branch, plotNo, landSize, venture})
+      });
+      ss.className = 'saved';
+      ss.innerHTML = '&#10003;&nbsp; Saved to Google Sheets &mdash; Receipt #' + sno;
+      setTimeout(() => { ss.style.display = 'none'; }, 6000);
+      showToast('Receipt #' + sno + ' saved!');
+    } catch {
+      ss.className = 'failed';
+      ss.innerHTML = '&#10005;&nbsp; Could not save to Google Sheets.';
+      showToast('Sheets save failed', true);
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '&#8595; Download PDF &amp; Save to Sheets';
+  }
+
+  // ── Clear ──
+  function clearForm() {
+    ['from_name','amount_words','amount_num','cheque_no','bank','branch','plot_no','land_size','venture']
+      .forEach(id => document.getElementById(id).value = '');
+    document.getElementById('pay_mode').selectedIndex = 0;
+    document.getElementById('date').valueAsDate = new Date();
+    document.getElementById('receipt-preview').style.display = 'none';
+    const ss = document.getElementById('sheets-status');
+    ss.className = ''; ss.style.display = 'none';
+  }
+</script>
+</body>
+</html>
