@@ -132,7 +132,7 @@ tbody td{padding:11px 14px;color:var(--dk);vertical-align:middle}
     <h2>Payment Details</h2>
     <div class="fg">
       <div class="fi"><label>Payment Mode</label>
-        <select id="ipay"><option>Cash</option><option>Card</option><option>Cheque</option><option>Online </option></select>
+        <select id="ipay"><option>Cash</option><option>Card</option><option>Cheque</option><option>Online / NEFT</option></select>
       </div>
       <div class="fi"><label>Cheque / Transaction No.</label><input type="text" id="icheque" placeholder="If applicable"></div>
       <div class="fi"><label>Bank</label><input type="text" id="ibank" placeholder="Bank name"></div>
@@ -196,7 +196,7 @@ tbody td{padding:11px 14px;color:var(--dk);vertical-align:middle}
     <input type="text" id="hsearch" placeholder="Search by name, plot, venture..." oninput="filterH()">
     <select id="hmode" onchange="filterH()">
       <option value="">All Payment Modes</option>
-      <option>Cash</option><option>Card</option><option>Cheque</option><option>Online </option>
+      <option>Cash</option><option>Card</option><option>Cheque</option><option>Online / NEFT</option>
     </select>
     <input type="date" id="hdfrom" onchange="filterH()" title="From date" style="width:140px">
     <input type="date" id="hdto" onchange="filterH()" title="To date" style="width:140px">
@@ -298,89 +298,94 @@ window.generateReceipt = function() {
 
 function buildPDF(r) {
   var J = window.jspdf || window.jspdf;
-  var doc = new J.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
-  var W=297, mg=16, y=16;
+  // A5 landscape: 210 x 148 mm
+  var doc = new J.jsPDF({orientation:'landscape',unit:'mm',format:'a5'});
+  var W=210, mg=10, y=12;
 
-  // Fix date — strip GMT string if present
+  // Fix date
   var rdate = r.date || '';
   if(rdate.indexOf('GMT') !== -1 || rdate.indexOf('Standard') !== -1) {
     var d = new Date(rdate);
     rdate = isNaN(d.getTime()) ? rdate : d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric',timeZone:'Asia/Kolkata'});
   }
 
-  doc.setFillColor(107,26,46); doc.rect(mg,y-6,W-mg*2,2,'F');
-  // Company name — bigger
-  doc.setFont('helvetica','bold'); doc.setFontSize(22); doc.setTextColor(107,26,46);
-  doc.text('SWARGASEEMA',mg,y+4);
-  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(80,80,80);
-  doc.text('SANDALWOOD FARMS PVT. LTD.',mg,y+10);
-  doc.setFontSize(8); doc.setTextColor(140,140,140); doc.text('add big results...',mg,y+15);
-  doc.setFontSize(8); doc.setTextColor(90,90,90);
-  doc.text('Unit S-7, Fantasy Square Complex, Gachibowli, Hyderabad-500032',mg,y+21);
-  doc.text('Mob: 9849012500, 9848661666',mg,y+26);
+  // Top bar
+  doc.setFillColor(107,26,46); doc.rect(mg,y-5,W-mg*2,1.5,'F');
 
-  // Receipt badge — bigger
-  doc.setFillColor(107,26,46); doc.roundedRect(W-mg-46,y-4,46,16,2,2,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(255,255,255);
-  doc.text('RECEIPT',W-mg-23,y+7,{align:'center'});
+  // Company name
   doc.setFont('helvetica','bold'); doc.setFontSize(14); doc.setTextColor(107,26,46);
-  doc.text('S. No.  '+(r.sno||''),W-mg,y+18,{align:'right'});
-  doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(90,90,90);
-  doc.text(rdate,W-mg,y+25,{align:'right'});
+  doc.text('SWARGASEEMA',mg,y+2);
+  doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(80,80,80);
+  doc.text('SANDALWOOD FARMS PVT. LTD.',mg,y+7);
+  doc.setFontSize(6); doc.setTextColor(140,140,140); doc.text('add big results...',mg,y+11);
+  doc.setFontSize(6.5); doc.setTextColor(90,90,90);
+  doc.text('Unit S-7, Fantasy Square Complex, Gachibowli, Hyderabad-500032',mg,y+16);
+  doc.text('Mob: 9849012500, 9848661666',mg,y+21);
 
-  y+=38;
-  doc.setDrawColor(180,160,130); doc.setLineWidth(0.5); doc.line(mg,y,W-mg,y); y+=10;
+  // Receipt badge
+  doc.setFillColor(107,26,46); doc.roundedRect(W-mg-32,y-3,32,11,2,2,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(255,255,255);
+  doc.text('RECEIPT',W-mg-16,y+4.5,{align:'center'});
+  doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(107,26,46);
+  doc.text('S. No.  '+(r.sno||''),W-mg,y+14,{align:'right'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(90,90,90);
+  doc.text(rdate,W-mg,y+19,{align:'right'});
 
-  // dl helper — font size 11
+  y+=28;
+  doc.setDrawColor(180,160,130); doc.setLineWidth(0.4); doc.line(mg,y,W-mg,y); y+=7;
+
+  // dl helper
   function dl(lbl,val,xpos) {
     val=val||'—'; xpos=xpos||mg;
-    doc.setFont('helvetica','normal'); doc.setFontSize(11); doc.setTextColor(60,60,60); doc.text(lbl,xpos,y);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(60,60,60); doc.text(lbl,xpos,y);
     var lw=doc.getTextWidth(lbl);
     doc.setFont('helvetica','bold'); doc.setTextColor(20,20,20); doc.text(val,xpos+lw+1,y);
-    doc.setDrawColor(100,100,100); doc.setLineWidth(0.3);
-    doc.line(xpos+lw+1,y+1,xpos+lw+1+Math.max(doc.getTextWidth(val),40),y+1);
+    doc.setDrawColor(100,100,100); doc.setLineWidth(0.25);
+    doc.line(xpos+lw+1,y+0.8,xpos+lw+1+Math.max(doc.getTextWidth(val),30),y+0.8);
   }
 
-  // Amount words row
-  doc.setFont('helvetica','normal'); doc.setFontSize(11); doc.setTextColor(60,60,60);
-  doc.text('Received with thanks a sum of Rupees',mg,y); y+=8;
-  doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(20,20,20);
+  // Amount words
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(60,60,60);
+  doc.text('Received with thanks a sum of Rupees',mg,y); y+=6;
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(20,20,20);
   doc.text((r.words||'—')+'  only',mg,y);
-  doc.setDrawColor(100,100,100); doc.setLineWidth(0.3); doc.line(mg,y+1,W-mg,y+1); y+=10;
+  doc.setDrawColor(100,100,100); doc.setLineWidth(0.25); doc.line(mg,y+0.8,W-mg,y+0.8); y+=8;
 
-  // From
-  dl('from Sri/Smt/Kum  ',r.name); y+=10;
-  // Cheque
-  dl('by '+(r.payMode||'Cash')+' / Cheque No.  ',r.cheque); y+=10;
+  dl('from Sri/Smt/Kum  ',r.name); y+=8;
+  dl('by '+(r.payMode||'Cash')+' / Cheque No.  ',r.cheque); y+=8;
 
-  // Bank / Branch row
+  // Bank / Branch
   var bk=r.bank||'—', br2=r.branch||'—';
-  doc.setFont('helvetica','normal'); doc.setFontSize(11); doc.setTextColor(60,60,60); doc.text('Drawn on  ',mg,y);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(60,60,60); doc.text('Drawn on  ',mg,y);
   var bLw=doc.getTextWidth('Drawn on  ');
   doc.setFont('helvetica','bold'); doc.setTextColor(20,20,20); doc.text(bk,mg+bLw+1,y);
-  doc.setDrawColor(100,100,100); doc.setLineWidth(0.3); doc.line(mg+bLw+1,y+1,mg+bLw+1+Math.max(doc.getTextWidth(bk),30),y+1);
-  var ab=mg+bLw+1+Math.max(doc.getTextWidth(bk),30)+4;
+  doc.setDrawColor(100,100,100); doc.setLineWidth(0.25); doc.line(mg+bLw+1,y+0.8,mg+bLw+1+Math.max(doc.getTextWidth(bk),22),y+0.8);
+  var ab=mg+bLw+1+Math.max(doc.getTextWidth(bk),22)+3;
   doc.setFont('helvetica','normal'); doc.setTextColor(60,60,60); doc.text('Bank,  ',ab,y);
   doc.setFont('helvetica','bold'); doc.setTextColor(20,20,20); doc.text(br2,ab+doc.getTextWidth('Bank,  ')+1,y);
-  doc.text(' Branch',ab+doc.getTextWidth('Bank,  ')+1+doc.getTextWidth(br2),y); y+=10;
+  doc.text(' Branch',ab+doc.getTextWidth('Bank,  ')+1+doc.getTextWidth(br2),y); y+=8;
 
-  // Plot No | Land Size | Venture — all on ONE line side by side
-  var col1=mg, col2=mg+85, col3=mg+175;
+  // Plot No | Land Size | Venture — side by side
+  var col1=mg, col2=mg+60, col3=mg+125;
   dl('Plot No.  ',r.plotNo,col1);
   dl('Plot/Farm Land Size  ',r.landSize,col2);
   dl('Venture  ',r.venture,col3);
-  y+=10;
+  y+=8;
   y+=4;
   doc.setFillColor(253,248,240); doc.roundedRect(mg,y,W-mg*2,14,2,2,'F');
   doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(107,26,46); doc.text('Rs.',mg+4,y+9.5);
   doc.setFontSize(15); doc.setTextColor(20,20,20); doc.text(fmtA(r.amount),mg+18,y+9.5); y+=18;
   doc.setFont('helvetica','italic'); doc.setFontSize(7.5); doc.setTextColor(150,150,150);
-  doc.text('Subject to realization of cheque',mg,y); y+=14;
-  doc.setDrawColor(180,160,130); doc.setLineWidth(0.4); doc.line(mg,y,W-mg,y); y+=8;
-  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(80,80,80); doc.text('For',W-mg-62,y);
-  doc.setFont('helvetica','bold'); doc.setTextColor(107,26,46); doc.text('Swargaseema Sandalwood Farms Pvt. Ltd.,',W-mg-55,y); y+=14;
-  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(80,80,80); doc.text('Authorised Signatory',W-mg-39,y);
-  doc.setFillColor(107,26,46); doc.rect(mg,y+6,W-mg*2,1,'F');
+  doc.text('Subject to realization of cheque',mg,y); y+=8;
+  // Footer divider line
+  doc.setDrawColor(180,160,130); doc.setLineWidth(0.4); doc.line(mg,y,W-mg,y); y+=5;
+  // For + company name
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(80,80,80); doc.text('For',W-mg-58,y);
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(107,26,46); doc.text('Swargaseema Sandalwood Farms Pvt. Ltd.,',W-mg-52,y); y+=16;
+  // Authorised Signatory
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(80,80,80); doc.text('Authorised Signatory',W-mg-40,y); y+=7;
+  // Bottom red bar
+  doc.setFillColor(107,26,46); doc.rect(mg,y,W-mg*2,1.5,'F');
   return doc;
 }
 
