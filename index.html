@@ -479,15 +479,20 @@ function showToast(msg, isErr) {
 // ─────────────────────────────────────
 //  INIT
 // ─────────────────────────────────────
-document.getElementById('date').valueAsDate = new Date();
-syncSerialFromSheet();
-
 function v(id) { return document.getElementById(id).value.trim(); }
+
+window.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('date').valueAsDate = new Date();
+  // Show 001 immediately from localStorage, then sync from sheet
+  refreshSno();
+  syncSerialFromSheet();
+});
 
 // ─────────────────────────────────────
 //  PREVIEW
 // ─────────────────────────────────────
 function generateReceipt() {
+  try {
   const sno     = fmtSno(curSno());
   const dateStr = v('date') ? new Date(v('date')).toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'}) : '';
   const num     = v('amount_num');
@@ -507,8 +512,10 @@ function generateReceipt() {
     ? 'Rs. ' + parseFloat(num).toLocaleString('en-IN', {minimumFractionDigits:2})
     : '_______________';
 
-  document.getElementById('receipt-preview').style.display = 'block';
-  setTimeout(() => document.getElementById('receipt-preview').scrollIntoView({behavior:'smooth', block:'start'}), 50);
+  const preview = document.getElementById('receipt-preview');
+  preview.style.display = 'block';
+  setTimeout(() => preview.scrollIntoView({behavior:'smooth', block:'nearest'}), 100);
+  } catch(err) { showToast('Error: ' + err.message, true); console.error(err); }
 }
 
 // ─────────────────────────────────────
